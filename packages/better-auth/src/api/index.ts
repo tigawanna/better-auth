@@ -29,6 +29,7 @@ import {
 	unlinkAccount,
 	refreshToken,
 	getAccessToken,
+	accountInfo,
 } from "./routes";
 import { ok } from "./routes/ok";
 import { signUpEmail } from "./routes/sign-up";
@@ -114,6 +115,7 @@ export function getEndpoints<
 		unlinkAccount,
 		refreshToken,
 		getAccessToken,
+		accountInfo,
 	};
 	const endpoints = {
 		...baseEndpoints,
@@ -121,6 +123,22 @@ export function getEndpoints<
 		ok,
 		error,
 	};
+	// modify based on custom paths
+	if (options.customPaths) {
+		Object.keys(endpoints).forEach((key) => {
+			const endpoint = endpoints[key as keyof typeof endpoints];
+			if (
+				endpoint &&
+				"path" in endpoint &&
+				typeof endpoint.path === "string" &&
+				options.customPaths?.[endpoint.path]
+			) {
+				const original = endpoint.path;
+				const modified = options.customPaths[original];
+				(endpoint as { path: string }).path = modified;
+			}
+		});
+	}
 	const api = toAuthEndpoints(endpoints, ctx);
 	return {
 		api: api as typeof endpoints & PluginEndpoint,
