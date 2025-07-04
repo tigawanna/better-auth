@@ -597,7 +597,7 @@ await authClient.organization.updateMemberRole({
 
 ### Get Active Member
 
-To get the current member of the organization you can use the `organization.getActiveMember` function. This function will return the current active member.
+To get the member details of the active organization you can use the `organization.getActiveMember` function.
 
 ```ts title="auth-client.ts"
 const member = await authClient.organization.getActiveMember()
@@ -973,7 +973,14 @@ The teams feature supports several configuration options:
       // Dynamic limit based on organization plan
       const plan = await getPlan(organizationId)
       return plan === 'pro' ? 20 : 5
-    }
+    },
+    maximumMembersPerTeam: 10 // Fixed number
+    // OR
+    maximumMembersPerTeam: async ({ teamId, session, organizationId }, request) => {
+      // Dynamic limit based on team plan
+      const plan = await getPlan(organizationId, teamId)
+      return plan === 'pro' ? 50 : 10
+    },
   }
   ```
 
